@@ -1,0 +1,31 @@
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import javax.swing.*;
+import javax.swing.border.*;
+import com.formdev.flatlaf.FlatDarkLaf;
+
+final class VulnTheme {
+    static final Color CANVAS=new Color(0x191919),NAV=new Color(0x191919),PANEL=new Color(0x1C1C1C),RAISED=new Color(0x242424),BORDER=new Color(0x333333),TEXT=new Color(0xD4D4D4),MUTED=new Color(0x949494),ACCENT=new Color(0xE4B248),BLUE=new Color(0x8ABADB),DANGER=new Color(0xE1857C),GREEN=new Color(0x75CD98);
+    static void setup(){
+        UIManager.put("defaultFont",new Font("Segoe UI",Font.PLAIN,13));
+        FlatDarkLaf.setup();
+        for(String key:new String[]{"Panel.background","TabbedPane.background","Viewport.background","ScrollPane.background","MenuBar.background","ToolBar.background"})UIManager.put(key,CANVAS);
+        for(String key:new String[]{"Table.background","Tree.background","TextArea.background","TextField.background","FormattedTextField.background","Spinner.background","ComboBox.background"})UIManager.put(key,PANEL);
+        for(String key:new String[]{"Label.foreground","Table.foreground","Tree.textForeground","TextArea.foreground","TextField.foreground","FormattedTextField.foreground","CheckBox.foreground","ComboBox.foreground"})UIManager.put(key,TEXT);
+        UIManager.put("Component.accentColor",ACCENT);UIManager.put("Component.focusColor",ACCENT);UIManager.put("Component.borderColor",BORDER);UIManager.put("Component.focusWidth",1);UIManager.put("Component.arc",6);UIManager.put("Button.arc",6);UIManager.put("TextComponent.arc",6);UIManager.put("Button.background",RAISED);UIManager.put("Button.foreground",TEXT);UIManager.put("Button.default.background",ACCENT);UIManager.put("Button.default.foreground",CANVAS);UIManager.put("Button.margin",new Insets(8,13,8,13));UIManager.put("TextField.margin",new Insets(7,9,7,9));UIManager.put("Table.rowHeight",30);UIManager.put("Table.showHorizontalLines",true);UIManager.put("Table.showVerticalLines",true);UIManager.put("Table.gridColor",BORDER);UIManager.put("Table.selectionBackground",new Color(0x343128));UIManager.put("Table.selectionForeground",TEXT);UIManager.put("TableHeader.background",CANVAS);UIManager.put("TableHeader.foreground",MUTED);UIManager.put("TableHeader.height",32);UIManager.put("ScrollPane.border",new LineBorder(BORDER));UIManager.put("TabbedPane.showTabSeparators",false);UIManager.put("TabbedPane.tabHeight",38);UIManager.put("TabbedPane.underlineColor",ACCENT);UIManager.put("TabbedPane.inactiveUnderlineColor",ACCENT);UIManager.put("TabbedPane.focusColor",RAISED);UIManager.put("TabbedPane.contentAreaColor",CANVAS);UIManager.put("TabbedPane.contentSeparatorHeight",1);UIManager.put("SplitPane.dividerSize",7);UIManager.put("TitledBorder.titleColor",MUTED);UIManager.put("MenuItem.selectionBackground",RAISED);UIManager.put("ProgressBar.foreground",ACCENT);
+    }
+    static JLabel label(String text,int size,Color color){JLabel l=new JLabel(text);l.setFont(new Font("Segoe UI",size>=20?Font.BOLD:Font.PLAIN,size));l.setForeground(color);return l;}
+    static void bindFilter(JTextField field,JTable table){field.getDocument().addDocumentListener(new javax.swing.event.DocumentListener(){public void insertUpdate(javax.swing.event.DocumentEvent e){apply();}public void removeUpdate(javax.swing.event.DocumentEvent e){apply();}public void changedUpdate(javax.swing.event.DocumentEvent e){apply();}void apply(){((javax.swing.table.TableRowSorter<?>)table.getRowSorter()).setRowFilter(field.getText().isBlank()?null:javax.swing.RowFilter.regexFilter("(?i)"+java.util.regex.Pattern.quote(field.getText())));}});}
+    static JButton primary(String text,Runnable action){JButton b=new JButton(text);b.setBackground(ACCENT);b.setForeground(CANVAS);b.putClientProperty("JButton.buttonType","square");b.addActionListener(e->action.run());return b;}
+    static BufferedImage icon(int size){BufferedImage image=new BufferedImage(size,size,BufferedImage.TYPE_INT_ARGB);Graphics2D g=image.createGraphics();g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);g.scale(size/64.0,size/64.0);g.setColor(PANEL);g.fillRoundRect(0,0,64,64,16,16);g.setColor(ACCENT);g.setStroke(new BasicStroke(3.2f,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));g.draw(new java.awt.geom.Path2D.Double(){ {moveTo(32,11);lineTo(49,18);lineTo(46,39);quadTo(42,48,32,54);quadTo(22,48,18,39);lineTo(15,18);closePath();} });g.setStroke(new BasicStroke(4.4f,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));g.drawLine(24,27,31,40);g.drawLine(31,40,41,23);g.dispose();return image;}
+    static class Card extends JPanel {
+        Card(LayoutManager layout){super(layout);setOpaque(false);setBorder(new EmptyBorder(18,20,18,20));}
+        protected void paintComponent(Graphics graphics){Graphics2D g=(Graphics2D)graphics.create();g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);g.setColor(PANEL);g.fillRoundRect(0,0,getWidth()-1,getHeight()-1,8,8);g.setColor(BORDER);g.drawRoundRect(0,0,getWidth()-1,getHeight()-1,8,8);g.dispose();super.paintComponent(graphics);}
+    }
+    static class ToolbarLayout extends FlowLayout {
+        ToolbarLayout(){super(FlowLayout.LEFT,8,6);}
+        public Dimension preferredLayoutSize(Container target){return size(target,false);}
+        public Dimension minimumLayoutSize(Container target){return size(target,true);}
+        Dimension size(Container target,boolean minimum){synchronized(target.getTreeLock()){int width=target.getWidth();if(width<=0){Container parent=target.getParent();width=parent==null?1200:parent.getWidth();}if(width<=0)width=1200;Insets insets=target.getInsets();int max=width-insets.left-insets.right-getHgap()*2,rowW=0,rowH=0,totalW=0,totalH=0;for(Component child:target.getComponents()){if(!child.isVisible())continue;Dimension d=minimum?child.getMinimumSize():child.getPreferredSize();if(rowW>0&&rowW+getHgap()+d.width>max){totalW=Math.max(totalW,rowW);totalH+=rowH+getVgap();rowW=0;rowH=0;}if(rowW>0)rowW+=getHgap();rowW+=d.width;rowH=Math.max(rowH,d.height);}totalW=Math.max(totalW,rowW);totalH+=rowH;return new Dimension(totalW+insets.left+insets.right+getHgap()*2,totalH+insets.top+insets.bottom+getVgap()*2);}}
+    }
+}

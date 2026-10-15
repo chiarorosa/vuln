@@ -1,0 +1,15 @@
+import java.util.*;
+
+/** Bounded JSON parser used for local data formats; no code evaluation. */
+final class Json {
+    final String text;int pos,depth;
+    Json(String text){if(text.length()>32*1024*1024)throw new IllegalArgumentException("JSON exceeds 32 MiB");this.text=text;}
+    static Object parse(String text){Json p=new Json(text);Object value=p.value();p.space();if(p.pos!=text.length())throw p.error();return value;}
+    IllegalArgumentException error(){return new IllegalArgumentException("JSON inválido na posição "+pos);}
+    void space(){while(pos<text.length()&&Character.isWhitespace(text.charAt(pos)))pos++;}
+    Object value(){space();if(++depth>128)throw error();try{if(pos>=text.length())throw error();char c=text.charAt(pos);if(c=='"')return string();if(c=='{'){pos++;Map<String,Object> m=new LinkedHashMap<>();space();if(take('}'))return m;do{space();String key=string();space();if(!take(':'))throw error();m.put(key,value());space();if(take('}'))return m;}while(take(','));throw error();}if(c=='['){pos++;List<Object> a=new ArrayList<>();space();if(take(']'))return a;do{a.add(value());space();if(take(']'))return a;}while(take(','));throw error();}for(String word:List.of("true","false","null"))if(text.startsWith(word,pos)){pos+=word.length();return word.equals("null")?null:Boolean.valueOf(word);}int start=pos;while(pos<text.length()&&"0123456789+-.eE".indexOf(text.charAt(pos))>=0)pos++;String n=text.substring(start,pos);if(!n.matches("-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?"))throw error();return new java.math.BigDecimal(n);}finally{depth--;}}
+    boolean take(char c){if(pos<text.length()&&text.charAt(pos)==c){pos++;return true;}return false;}
+    String string(){if(!take('"'))throw error();StringBuilder out=new StringBuilder();while(pos<text.length()){char c=text.charAt(pos++);if(c=='"')return out.toString();if(c<32)throw error();if(c=='\\'){if(pos>=text.length())throw error();char e=text.charAt(pos++);switch(e){case '"','\\','/'->out.append(e);case 'b'->out.append('\b');case 'f'->out.append('\f');case 'n'->out.append('\n');case 'r'->out.append('\r');case 't'->out.append('\t');case 'u'->{if(pos+4>text.length())throw error();out.append((char)Integer.parseInt(text.substring(pos,pos+4),16));pos+=4;}default->throw error();}}else out.append(c);}throw error();}
+    static String write(Object o){if(o==null)return "null";if(o instanceof String s)return VulnApp.json(s);if(o instanceof Number||o instanceof Boolean)return o.toString();if(o instanceof Map<?,?> map){List<String> list=new ArrayList<>();map.forEach((k,v)->list.add(VulnApp.json(k.toString())+":"+write(v)));return "{"+String.join(",",list)+"}";}if(o instanceof Collection<?> c)return "["+String.join(",",c.stream().map(Json::write).toList())+"]";throw new IllegalArgumentException("Unsupported JSON type");}
+    @SuppressWarnings("unchecked") static Map<String,Object> object(Object o){if(!(o instanceof Map))throw new IllegalArgumentException("JSON object required");return (Map<String,Object>)o;}
+}

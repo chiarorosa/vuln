@@ -1,0 +1,8 @@
+{
+  "flatlaf": {
+    "version": "3.7.2",
+    "url": "https://repo.maven.apache.org/maven2/com/formdev/flatlaf/3.7.2/flatlaf-3.7.2.jar",
+    "sha256": "917aff3963c88d797d0fd9b9ccbd70f7681c101df9d11c59e2bc7a3a6c0fabf4",
+    "license": "Apache-2.0"
+  }
+}

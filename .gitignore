@@ -1,0 +1,54 @@
+# Allowlist: everything is ignored unless explicitly re-included below.
+/*
+!/.gitignore
+!/.gitattributes
+!/.editorconfig
+!/.github/
+!/docs/
+!/desktop/
+!/README.md
+!/README.pt-BR.md
+!/LICENSE
+!/CONTRIBUTING.md
+!/CODE_OF_CONDUCT.md
+!/SECURITY.md
+!/CHANGELOG.md
+!/DESIGN.md
+!/start.cmd
+
+# Never versioned: third-party material, research and local tooling.
+/original/
+/evidence/
+/vendor/
+/work/
+/.claude/
+
+# desktop/: sources, build scripts and docs only.
+/desktop/*
+!/desktop/src/
+!/desktop/assets/
+!/desktop/tools/
+!/desktop/extensions/
+!/desktop/lib/
+!/desktop/build.ps1
+!/desktop/test.ps1
+!/desktop/package-vuln.ps1
+!/desktop/setup-deps.mjs
+!/desktop/setup-workspace-deps.mjs
+!/desktop/README-3.2.1.md
+!/desktop/VULN-Roadmap.md
+
+/desktop/extensions/*
+!/desktop/extensions/src/
+!/desktop/extensions/resources/
+!/desktop/extensions/build.ps1
+
+# Dependencies are downloaded by setup-*.mjs; only their pinned metadata is tracked.
+/desktop/lib/*
+!/desktop/lib/dependencies.json
+!/desktop/lib/workspace-dependencies.json
+
+*.class
+*.jar
+*.exe
+*.zip
